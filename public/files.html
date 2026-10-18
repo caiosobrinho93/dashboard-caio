@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Arquivos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">📁</span>
+        <div>
+          <h1>Dashboard Caio 2.0</h1>
+          <p>Arquivos</p>
+        </div>
+      </div>
+      <div class="nav-label">Menu principal</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link"><span class="nav-ico">🏠</span><span>Inicio</span></a>
+        <a href="components.html" class="nav-link"><span class="nav-ico">🧩</span><span>Componentes</span></a>
+        <a href="finances.html" class="nav-link"><span class="nav-ico">💰</span><span>Financas</span></a>
+        <a href="backup.html" class="nav-link"><span class="nav-ico">💾</span><span>Backup</span></a>
+        <a href="files.html" class="nav-link active"><span class="nav-ico">📁</span><span>Arquivos</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>Explorador de Arquivos</h2>
+          <p class="muted">Duplo clique abre pastas e arquivos — estilo Windows</p>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="explorer">
+          <div class="tree" id="tree"></div>
+          <div class="explorer-main">
+            <div class="breadcrumb" id="breadcrumb"></div>
+            <div class="explorer-grid" id="egrid"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="fileModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3 id="fileModalTitle">Arquivo</h3>
+        <button class="icon-btn" onclick="document.getElementById('fileModal').classList.add('hidden')">✕</button>
+      </div>
+      <pre id="fileModalContent" class="code-block" style="max-height:60vh;"></pre>
+    </div>
+  </div>
+
+  <script>
+    let currentPath = "";
+    let selectedEl = null;
+
+    function selectItem(el) {
+      if (selectedEl) selectedEl.classList.remove('selected');
+      selectedEl = el;
+      if (el) el.classList.add('selected');
+    }
+
+    async function loadDir(p) {
+      currentPath = p;
+      selectItem(null);
+      const res = await fetch('/api/files?path=' + encodeURIComponent(p));
+      const data = await res.json();
+      renderBreadcrumb(p);
+      const grid = document.getElementById('egrid');
+      grid.innerHTML = '';
+      if (data.type !== 'dir') { loadFile(p); return; }
+      if (p) {
+        const up = document.createElement('div');
+        up.className = 'fitem';
+        up.innerHTML = '<div class="icon">⬆️</div><div class="name">..</div>';
+        up.addEventListener('click', () => {
+          const parts = p.split('/').filter(Boolean);
+          parts.pop();
+          loadDir(parts.join('/'));
+        });
+        grid.appendChild(up);
+      }
+      for (const e of data.entries) {
+        const item = document.createElement('div');
+        item.className = 'fitem';
+        const icon = e.type === 'dir' ? '📁' : fileIcon(e.name);
+        item.innerHTML = `<div class="icon">${icon}</div><div class="name">${e.name}</div>`;
+        item.addEventListener('click', () => selectItem(item));
+        item.addEventListener('dblclick', () => {
+          const np = (p ? p + '/' : '') + e.name;
+          if (e.type === 'dir') loadDir(np);
+          else loadFile(np);
+        });
+        grid.appendChild(item);
+      }
+      loadTree();
+    }
+
+    async function loadFile(p) {
+      const res = await fetch('/api/files?path=' + encodeURIComponent(p));
+      const data = await res.json();
+      document.getElementById('fileModalTitle').textContent = p.split('/').pop();
+      document.getElementById('fileModalContent').textContent = data.content || '(arquivo vazio ou binario)';
+      document.getElementById('fileModal').classList.remove('hidden');
+    }
+
+    function fileIcon(name) {
+      const ext = name.split('.').pop().toLowerCase();
+      const map = { js: '📜', ts: '📜', html: '🌐', css: '🎨', json: '📋', md: '📝', txt: '📄', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', svg: '🖼️', py: '🐍', java: '☕', cpp: '⚙️', c: '⚙️', exe: '⚙️', zip: '🗜️', pdf: '📕' };
+      return map[ext] || '📄';
+    }
+
+    function renderBreadcrumb(p) {
+      const bc = document.getElementById('breadcrumb');
+      bc.innerHTML = '';
+      const parts = (p || '').split('/').filter(Boolean);
+      let acc = '';
+      const home = document.createElement('span');
+      home.textContent = '🏠 raiz';
+      home.addEventListener('click', () => loadDir(''));
+      bc.appendChild(home);
+      for (const part of parts) {
+        acc += (acc ? '/' : '') + part;
+        const sep = document.createElement('span');
+        sep.className = 'sep';
+        sep.textContent = '›';
+        bc.appendChild(sep);
+        const sp = document.createElement('span');
+        sp.textContent = part;
+        const target = acc;
+        sp.addEventListener('click', () => loadDir(target));
+        bc.appendChild(sp);
+      }
+    }
+
+    async function loadTree() {
+      const tree = document.getElementById('tree');
+      tree.innerHTML = '';
+      const title = document.createElement('div');
+      title.className = 'tree-title';
+      title.textContent = 'Pastas';
+      tree.appendChild(title);
+      const res = await fetch('/api/files?path=');
+      const data = await res.json();
+      if (data.type !== 'dir') return;
+      const rootItem = document.createElement('div');
+      rootItem.className = 'tree-item' + (currentPath === '' ? ' active' : '');
+      rootItem.innerHTML = '🏠 raiz';
+      rootItem.addEventListener('click', () => loadDir(''));
+      tree.appendChild(rootItem);
+      for (const e of data.entries) {
+        if (e.type !== 'dir') continue;
+        const item = document.createElement('div');
+        item.className = 'tree-item' + (currentPath === e.name ? ' active' : '');
+        item.innerHTML = '📁 ' + e.name;
+        item.addEventListener('click', () => loadDir(e.name));
+        tree.appendChild(item);
+      }
+    }
+
+    loadDir('');
+  </script>
+  <script src="stars-bg.js"></script>
+  <script src="notifications.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>

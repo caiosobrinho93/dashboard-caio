@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Componentes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/standalone.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/babel.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/estree.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/postcss.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/html.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">🧩</span>
+        <div>
+          <h1>Dashboard Caio 2.0</h1>
+          <p>Componentes</p>
+        </div>
+      </div>
+      <div class="nav-label">Menu principal</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link"><span class="nav-ico">🏠</span><span>Inicio</span></a>
+        <a href="components.html" class="nav-link active"><span class="nav-ico">🧩</span><span>Componentes</span></a>
+        <a href="finances.html" class="nav-link"><span class="nav-ico">💰</span><span>Financas</span></a>
+        <a href="backup.html" class="nav-link"><span class="nav-ico">💾</span><span>Backup</span></a>
+        <a href="files.html" class="nav-link"><span class="nav-ico">📁</span><span>Arquivos</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btnNew" class="btn btn-primary full">+ Novo componente</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>Componentes</h2>
+          <p id="viewSub" class="muted">Selecione itens para gerar o design.md</p>
+        </div>
+        <div class="topbar-actions">
+          <input id="search" type="text" placeholder="Buscar componentes..." />
+          <select id="catSelect"></select>
+          <select id="sortSelect">
+            <option value="recent">Recentes</option>
+            <option value="popular">Populares</option>
+            <option value="name">Nome A-Z</option>
+            <option value="name_desc">Nome Z-A</option>
+          </select>
+          <button id="btnPres" class="btn btn-ghost">🎭 Apresentacao</button>
+          <button id="btnStudio" class="btn btn-ghost">🛠 Estudios</button>
+          <button id="btnSelected" class="btn btn-ghost">Selecionados (<span id="selCount">0</span>)</button>
+          <button id="btnGenerate" class="btn btn-accent">Gerar design.md</button>
+        </div>
+      </header>
+
+      <div id="catChips"></div>
+      <section id="grid" class="grid"></section>
+    </main>
+  </div>
+
+  <!-- Modal: new/edit component -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3 id="modalTitle">Novo componente</h3>
+        <button id="modalClose" class="icon-btn">✕</button>
+      </div>
+      <form id="compForm">
+        <input type="hidden" id="compId" />
+        <div class="modal-two">
+          <div class="modal-col">
+            <div class="form-row">
+              <label>Nome</label>
+              <input id="compName" type="text" required placeholder="Ex: Botao primario" />
+            </div>
+            <div class="form-row two">
+              <div>
+                <label>Categoria</label>
+                <select id="compCategory" required></select>
+              </div>
+              <div>
+                <label>Linguagem</label>
+                <select id="compLang">
+                  <option value="html">HTML</option>
+                  <option value="css">CSS</option>
+                  <option value="js">JavaScript</option>
+                  <option value="jsx">JSX/React</option>
+                  <option value="tsx">TSX</option>
+                  <option value="tailwind">Tailwind</option>
+                  <option value="json">JSON</option>
+                  <option value="txt">Texto</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Tags (separadas por virgula)</label>
+              <input id="compTags" type="text" placeholder="animado, gradient, neon" />
+            </div>
+            <div class="form-actions">
+              <button type="button" id="modalCancel" class="btn btn-ghost">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+          </div>
+          <div class="modal-col">
+            <div class="code-tabs-bar">
+              <div id="editorTabs" class="code-tabs"></div>
+              <button type="button" id="addTabBtn" class="ctab plus">+</button>
+              <span id="detectHint" class="muted small" style="margin-left:auto;"></span>
+              <button type="button" id="fmtBtn" class="btn btn-ghost" style="padding:5px 12px;font-size:12px;">✨ Formatar</button>
+            </div>
+            <div id="editorArea" style="flex:1;display:flex;flex-direction:column;"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: view component -->
+  <div id="viewModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3 id="viewCompTitle">Componente</h3>
+        <button id="viewClose" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-two">
+        <div class="modal-col">
+          <div id="viewCompMeta" class="muted small"></div>
+          <pre id="viewCompCode" class="code-block" style="flex:1;"></pre>
+        </div>
+        <div class="modal-col">
+          <div id="viewPreview" class="card-preview" style="min-height:260px;border-radius:8px;"></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="viewSelect" class="btn btn-accent">Selecionar</button>
+        <button id="viewEdit" class="btn btn-ghost">Editar</button>
+        <button id="viewDelete" class="btn btn-danger">Excluir</button>
+        <button id="viewCopy" class="btn btn-primary">Copiar codigo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: generate -->
+  <div id="genModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3>Gerar design.md</h3>
+        <button id="genClose" class="icon-btn">✕</button>
+      </div>
+      <div class="form-row">
+        <label>Nome do projeto</label>
+        <input id="genName" type="text" value="Meu Projeto" />
+      </div>
+      <div class="form-row">
+        <label>Descricao (opcional)</label>
+        <textarea id="genDesc" rows="3" placeholder="Descreva o app que sera criado..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>Selecionados: <span id="genCount">0</span></label>
+      </div>
+      <div class="form-actions">
+        <button id="genCancel" class="btn btn-ghost">Cancelar</button>
+        <button id="genDo" class="btn btn-accent">Gerar e salvar</button>
+      </div>
+      <div id="genResult" class="gen-result hidden">
+        <p class="muted small">Salvo em: <code id="genPath"></code></p>
+        <textarea id="genContent" rows="16" readonly></textarea>
+        <button id="genDownload" class="btn btn-primary">Baixar .md</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: selecionados -->
+  <div id="selectedModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3>Itens selecionados</h3>
+        <button id="selectedClose" class="icon-btn">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button id="selViewGrid" class="btn btn-ghost">Miniaturas</button>
+        <button id="selViewList" class="btn btn-ghost">Lista</button>
+      </div>
+      <p class="muted small">Visualize o que esta sendo montado no seu design.md.</p>
+      <div id="selectedGrid" class="grid" style="max-height:60vh;overflow-y:auto;padding:8px 0;"></div>
+      <div class="form-actions">
+        <button id="selectedClear" class="btn btn-ghost">Limpar selecao</button>
+        <button id="selectedGen" class="btn btn-accent">Gerar design.md</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay: modo apresentacao -->
+  <div id="pres" class="pres hidden">
+    <div class="pres-top">
+      <div>
+        <div class="pres-title" id="presTitle">-</div>
+        <div class="pres-count" id="presCount"></div>
+      </div>
+      <button id="presClose" class="icon-btn">✕</button>
+    </div>
+    <div class="pres-stage"><div class="pres-frame" id="presFrame"></div></div>
+    <div class="pres-bottom">
+      <button id="presPrev" class="btn btn-ghost">‹ Anterior</button>
+      <button id="presPlay" class="btn btn-primary">▶ Auto</button>
+      <button id="presNext" class="btn btn-ghost">Proximo ›</button>
+      <div class="pres-dots" id="presDots"></div>
+    </div>
+  </div>
+
+  <!-- Modal: estudios de criacao -->
+  <div id="studioModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3>🛠 Estudios de criacao</h3>
+        <button id="studioClose" class="icon-btn">✕</button>
+      </div>
+      <div class="studio-tabs">
+        <button class="btn btn-ghost active" data-studio="grad">🌈 Gradiente</button>
+        <button class="btn btn-ghost" data-studio="btn">🔘 Botao CSS</button>
+        <button class="btn btn-ghost" data-studio="font">🔤 Google Fonts</button>
+      </div>
+
+      <!-- Gradiente -->
+      <div id="studioGrad" class="studio-grid">
+        <div class="modal-col">
+          <div class="slide-row"><label>Angulo</label><input type="range" id="gAngle" min="0" max="360" value="135" /><output id="gAngleOut">135°</output></div>
+          <div class="slide-row"><label>Cor inicial</label><input type="color" id="gC1" value="#7c5cff" /><output id="gC1Out">#7c5cff</output></div>
+          <div class="slide-row"><label>Cor final</label><input type="color" id="gC2" value="#22d3ee" /><output id="gC2Out">#22d3ee</output></div>
+          <div class="slide-row"><label>Animado</label><input type="checkbox" id="gAnim" checked style="width:auto;" /><output></output></div>
+          <div class="form-row" style="margin-top:14px;"><label>Nome do componente</label><input id="gName" placeholder="Ex: Gradiente aurora" /></div>
+          <div class="form-actions" style="justify-content:flex-start;"><button id="gSave" class="btn btn-primary">💾 Salvar nos componentes</button></div>
+        </div>
+        <div class="modal-col">
+          <div class="studio-preview" id="gPreview"></div>
+          <pre class="studio-code" id="gCode"></pre>
+        </div>
+      </div>
+
+      <!-- Botao -->
+      <div id="studioBtn" class="studio-grid" style="display:none;">
+        <div class="modal-col">
+          <div class="slide-row"><label>Arredondar</label><input type="range" id="bRadius" min="0" max="40" value="14" /><output id="bRadiusOut">14px</output></div>
+          <div class="slide-row"><label>Padding X</label><input type="range" id="bPadX" min="8" max="48" value="22" /><output id="bPadXOut">22px</output></div>
+          <div class="slide-row"><label>Padding Y</label><input type="range" id="bPadY" min="6" max="30" value="12" /><output id="bPadYOut">12px</output></div>
+          <div class="slide-row"><label>Fonte</label><input type="range" id="bFont" min="10" max="28" value="14" /><output id="bFontOut">14px</output></div>
+          <div class="slide-row"><label>Sombra</label><input type="range" id="bShadow" min="0" max="40" value="16" /><output id="bShadowOut">16px</output></div>
+          <div class="slide-row"><label>Cor 1</label><input type="color" id="bC1" value="#7c5cff" /><output id="bC1Out">#7c5cff</output></div>
+          <div class="slide-row"><label>Cor 2</label><input type="color" id="bC2" value="#22d3ee" /><output id="bC2Out">#22d3ee</output></div>
+          <div class="slide-row"><label>Texto</label><input type="color" id="bText" value="#ffffff" /><output id="bTextOut">#ffffff</output></div>
+          <div class="slide-row"><label>Gradiente</label><input type="checkbox" id="bGrad" checked style="width:auto;" /><output></output></div>
+          <div class="form-row" style="margin-top:14px;"><label>Nome do componente</label><input id="bName" placeholder="Ex: Botao aurora" /></div>
+          <div class="form-actions" style="justify-content:flex-start;"><button id="bSave" class="btn btn-primary">💾 Salvar nos componentes</button></div>
+        </div>
+        <div class="modal-col">
+          <div class="studio-preview" id="bPreview"></div>
+          <pre class="studio-code" id="bCode"></pre>
+        </div>
+      </div>
+
+      <!-- Google Fonts -->
+      <div id="studioFont" class="studio-grid" style="display:none;">
+        <div class="modal-col">
+          <div class="form-row"><label>Buscar fonte</label><input id="fSearch" placeholder="Ex: poppins, roboto, inter..." /></div>
+          <div class="font-scroll" id="fList"></div>
+        </div>
+        <div class="modal-col">
+          <div class="studio-preview" id="fPreview" style="flex-direction:column;gap:10px;">
+            <div id="fSample" style="font-size:34px;">Aa Bb Cc 0123</div>
+            <div id="fSample2" style="font-size:15px;color:var(--muted);">O rato roeu a roupa do rei de Roma.</div>
+          </div>
+          <div class="slide-row"><label>Tamanho</label><input type="range" id="fSize" min="16" max="56" value="34" /><output id="fSizeOut">34px</output></div>
+          <div class="form-row"><label>Nome do componente</label><input id="fName" placeholder="Ex: Fonte Poppins" /></div>
+          <div class="form-actions" style="justify-content:flex-start;"><button id="fSave" class="btn btn-primary">💾 Salvar nos componentes</button></div>
+          <pre class="studio-code" id="fCode"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+<script src="stars-bg.js"></script>
+  <script src="notifications.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>
+
+
+

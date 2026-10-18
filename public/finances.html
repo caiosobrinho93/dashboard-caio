@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Financas</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">💰</span>
+        <div>
+          <h1>Dashboard Caio 2.0</h1>
+          <p>Financas</p>
+        </div>
+      </div>
+      <div class="nav-label">Menu principal</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link"><span class="nav-ico">🏠</span><span>Inicio</span></a>
+        <a href="components.html" class="nav-link"><span class="nav-ico">🧩</span><span>Componentes</span></a>
+        <a href="finances.html" class="nav-link active"><span class="nav-ico">💰</span><span>Financas</span></a>
+        <a href="backup.html" class="nav-link"><span class="nav-ico">💾</span><span>Backup</span></a>
+        <a href="files.html" class="nav-link"><span class="nav-ico">📁</span><span>Arquivos</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>Financas</h2>
+          <p class="muted">Receitas, despesas, metas e gastos fixos</p>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="lbl">Saldo</div><div id="mBalance" class="val">R$ 0.00</div></div>
+            <div class="mini-stat"><div class="lbl">Receitas</div><div id="mIncome" class="val income">R$ 0.00</div></div>
+            <div class="mini-stat"><div class="lbl">Despesas</div><div id="mExpense" class="val expense">R$ 0.00</div></div>
+            <div class="mini-stat"><div class="lbl">Gastos fixos / mes</div><div id="mFixed" class="val expense">R$ 0.00</div></div>
+          </div>
+
+          <div class="fin-grid" style="margin-bottom:20px;">
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Nova movimentacao</h3>
+              <div class="form-grid">
+                <div class="form-row span-2">
+                  <label>Descricao</label>
+                  <input id="desc" placeholder="Ex: Salario, aluguel, freelance..." />
+                </div>
+                <div class="form-row">
+                  <label>Valor (R$)</label>
+                  <input id="amount" type="number" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="form-row">
+                  <label>Tipo</label>
+                  <select id="type">
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                  </select>
+                </div>
+                <div class="form-row span-2">
+                  <label>Data</label>
+                  <input id="date" type="date" />
+                </div>
+              </div>
+              <div class="form-actions" style="margin-top:16px;">
+                <button id="addTx" class="btn btn-primary full">+ Adicionar movimentacao</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Historico</h3>
+              <div id="txList" class="list-stack"></div>
+            </div>
+          </div>
+
+          <div class="fin-grid">
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Metas de economia</h3>
+              <div id="goalList"></div>
+              <div class="form-grid" style="margin-top:16px;">
+                <div class="form-row">
+                  <label>Nome da meta</label>
+                  <input id="goalName" placeholder="Ex: Viagem, PC novo..." />
+                </div>
+                <div class="form-row">
+                  <label>Objetivo (R$)</label>
+                  <input id="goalTarget" type="number" step="0.01" placeholder="1000.00" />
+                </div>
+              </div>
+              <div class="form-actions" style="margin-top:12px;">
+                <button id="goalAdd" class="btn btn-primary full">🎯 Criar meta</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Gastos fixos e assinaturas <span id="recTotal" class="muted small" style="margin-left:auto;font-weight:600;"></span></h3>
+              <div id="recList"></div>
+              <div class="form-grid" style="margin-top:16px;">
+                <div class="form-row">
+                  <label>Nome</label>
+                  <input id="recName" placeholder="Ex: Netflix, Spotify..." />
+                </div>
+                <div class="form-row">
+                  <label>Valor (R$)</label>
+                  <input id="recAmount" type="number" step="0.01" placeholder="39.90" />
+                </div>
+                <div class="form-row">
+                  <label>Dia do mes</label>
+                  <input id="recDay" type="number" min="1" max="31" value="5" />
+                </div>
+              </div>
+              <div class="form-actions" style="margin-top:12px;">
+                <button id="recAdd" class="btn btn-primary full">🔁 Adicionar gasto fixo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const fmt = (v) => 'R$ ' + Number(v).toFixed(2);
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    async function japi(path, opts) {
+      const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
+      return res.json();
+    }
+
+    async function load() {
+      const items = await fetch('/api/finances').then(r => r.json());
+      const list = document.getElementById('txList');
+      list.innerHTML = '';
+      let inc = 0, exp = 0;
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">Nenhuma movimentacao ainda — adicione a primeira no formulario.</div>';
+      }
+      for (const it of items) {
+        if (it.type === 'income') inc += it.amount; else exp += it.amount;
+        const row = document.createElement('div');
+        row.className = 'tx-row';
+        row.innerHTML = `
+          <div class="tx-info">
+            <div class="tx-name">${escapeHtml(it.description || (it.type === 'income' ? 'Receita' : 'Despesa'))}</div>
+            <div class="tx-date">${it.date || ''}</div>
+          </div>
+          <div class="tx-right">
+            <span class="tx-amount ${it.type === 'income' ? 'income' : 'expense'}">${it.type === 'income' ? '+' : '-'} ${fmt(it.amount)}</span>
+            <button class="icon-btn" title="Excluir">✕</button>
+          </div>`;
+        row.querySelector('button').addEventListener('click', async () => {
+          await fetch('/api/finances/' + it.id, { method: 'DELETE' });
+          load();
+        });
+        list.appendChild(row);
+      }
+      const bal = inc - exp;
+      const mb = document.getElementById('mBalance');
+      mb.textContent = fmt(bal);
+      mb.className = 'val ' + (bal >= 0 ? 'income' : 'expense');
+      document.getElementById('mIncome').textContent = fmt(inc);
+      document.getElementById('mExpense').textContent = fmt(exp);
+    }
+
+    document.getElementById('addTx').addEventListener('click', async () => {
+      const amount = document.getElementById('amount').value;
+      if (!amount || Number(amount) <= 0) { alert('Informe um valor maior que zero.'); return; }
+      const body = {
+        type: document.getElementById('type').value,
+        amount,
+        description: document.getElementById('desc').value,
+        date: document.getElementById('date').value,
+      };
+      await fetch('/api/finances', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      document.getElementById('desc').value = '';
+      document.getElementById('amount').value = '';
+      load();
+    });
+
+    /* ---------- Metas ---------- */
+    async function loadGoals() {
+      const goals = await fetch('/api/goals').then(r => r.json());
+      const box = document.getElementById('goalList');
+      box.innerHTML = '';
+      if (!goals.length) {
+        box.innerHTML = '<div class="empty" style="padding:30px 16px;">Nenhuma meta ainda. Crie a primeira abaixo.</div>';
+      }
+      for (const g of goals) {
+        const pct = Math.min(100, Math.round((g.saved / g.target) * 100));
+        const el = document.createElement('div');
+        el.className = 'goal' + (g.achieved ? ' achieved' : '');
+        el.innerHTML = `
+          <div class="goal-top">
+            <span class="goal-name">${g.achieved ? '✨ ' : ''}${escapeHtml(g.name)}</span>
+            ${g.achieved ? '<span class="badge-done">META BATIDA</span>' : `<span class="goal-vals"><b>${fmt(g.saved)}</b> / ${fmt(g.target)}</span>`}
+          </div>
+          <div class="goal-bar"><i style="width:${pct}%"></i></div>
+          <div class="goal-foot">
+            ${g.achieved ? `<span class="muted small">Concluida em ${(g.achievedAt || '').slice(0, 10).split('-').reverse().join('/')}</span>` : `<input type="number" step="0.01" placeholder="R$" />
+            <button class="btn btn-primary" data-act="dep">+ Guardar</button>`}
+            <button class="icon-btn" data-act="del" style="margin-left:auto;" title="Excluir">✕</button>
+          </div>`;
+        const depBtn = el.querySelector('[data-act="dep"]');
+        if (depBtn) {
+          depBtn.addEventListener('click', async () => {
+            const val = Number(el.querySelector('.goal-foot input').value);
+            if (!val || val <= 0) { alert('Informe um valor para guardar.'); return; }
+            const r = await japi('/api/goals/' + g.id, { method: 'PUT', body: JSON.stringify({ add: val }) });
+            if (r.award && window.DashToast) DashToast({ unlocked: r.award.unlocked });
+            loadGoals();
+          });
+        }
+        el.querySelector('[data-act="del"]').addEventListener('click', async () => {
+          if (!confirm('Excluir a meta "' + g.name + '"?')) return;
+          await fetch('/api/goals/' + g.id, { method: 'DELETE' });
+          loadGoals();
+        });
+        box.appendChild(el);
+      }
+    }
+    document.getElementById('goalAdd').addEventListener('click', async () => {
+      const name = document.getElementById('goalName').value.trim();
+      const target = document.getElementById('goalTarget').value;
+      if (!name || !target || Number(target) <= 0) { alert('Informe nome e objetivo da meta.'); return; }
+      await japi('/api/goals', { method: 'POST', body: JSON.stringify({ name, target }) });
+      document.getElementById('goalName').value = '';
+      document.getElementById('goalTarget').value = '';
+      loadGoals();
+    });
+
+    /* ---------- Gastos fixos ---------- */
+    async function loadRec() {
+      const recs = await fetch('/api/recurring').then(r => r.json());
+      const box = document.getElementById('recList');
+      box.innerHTML = '';
+      const total = recs.reduce((a, r) => a + r.amount, 0);
+      document.getElementById('recTotal').textContent = total ? `${fmt(total)} / mes` : '';
+      document.getElementById('mFixed').textContent = fmt(total);
+      if (!recs.length) {
+        box.innerHTML = '<div class="empty" style="padding:30px 16px;">Nenhum gasto fixo ainda. Adicione assinaturas e contas mensais abaixo.</div>';
+      }
+      for (const r of recs) {
+        const row = document.createElement('div');
+        row.className = 'rec-row';
+        row.innerHTML = `
+          <span class="rec-name">${escapeHtml(r.name)}</span>
+          <span class="rec-day">dia ${r.day}</span>
+          <span class="rec-amount">${fmt(r.amount)}</span>
+          <button class="icon-btn" style="width:28px;height:28px;font-size:12px;" title="Excluir">✕</button>`;
+        row.querySelector('button').addEventListener('click', async () => {
+          await fetch('/api/recurring/' + r.id, { method: 'DELETE' });
+          loadRec();
+        });
+        box.appendChild(row);
+      }
+    }
+    document.getElementById('recAdd').addEventListener('click', async () => {
+      const name = document.getElementById('recName').value.trim();
+      const amount = document.getElementById('recAmount').value;
+      if (!name || !amount || Number(amount) <= 0) { alert('Informe nome e valor do gasto fixo.'); return; }
+      await japi('/api/recurring', { method: 'POST', body: JSON.stringify({ name, amount, day: document.getElementById('recDay').value }) });
+      document.getElementById('recName').value = '';
+      document.getElementById('recAmount').value = '';
+      loadRec();
+    });
+
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+    load();
+    loadGoals();
+    loadRec();
+  </script>
+  <script src="stars-bg.js"></script>
+  <script src="notifications.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>

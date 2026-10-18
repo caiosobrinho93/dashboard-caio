@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Inicio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">🧩</span>
+        <div>
+          <h1>Dashboard Caio 2.0</h1>
+          <p>Inicio</p>
+        </div>
+      </div>
+      <div class="nav-label">Menu principal</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link active"><span class="nav-ico">🏠</span><span>Inicio</span></a>
+        <a href="components.html" class="nav-link"><span class="nav-ico">🧩</span><span>Componentes</span></a>
+        <a href="finances.html" class="nav-link"><span class="nav-ico">💰</span><span>Financas</span></a>
+        <a href="backup.html" class="nav-link"><span class="nav-ico">💾</span><span>Backup</span></a>
+        <a href="files.html" class="nav-link"><span class="nav-ico">📁</span><span>Arquivos</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>Inicio</h2>
+          <p class="muted">Visao geral do seu hub de desenvolvimento</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="qrBtn" class="btn btn-ghost">📱 Abrir no celular</button>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <section class="hero">
+            <h2>Sua central de componentes,<br>design e produtividade.</h2>
+            <p>Salve componentes visuais, gere um design.md completo para IA construir seus apps, controle financas, backups e navegue pelos arquivos do PC — tudo em um so lugar.</p>
+            <div class="hero-actions">
+              <a href="components.html" class="btn btn-primary" style="text-decoration:none;">🧩 Explorar componentes</a>
+              <a href="components.html" class="btn btn-ghost" style="text-decoration:none;">Gerar design.md</a>
+            </div>
+          </section>
+
+          <section class="stats">
+            <div class="stat">
+              <div class="stat-head"><span class="stat-label">Componentes</span><span class="stat-ico">🧩</span></div>
+              <div id="compCount" class="stat-value grad">-</div>
+              <a href="components.html">Abrir biblioteca →</a>
+            </div>
+            <div class="stat">
+              <div class="stat-head"><span class="stat-label">Saldo atual</span><span class="stat-ico">💰</span></div>
+              <div id="balance" class="stat-value">-</div>
+              <a href="finances.html">Abrir financas →</a>
+            </div>
+            <div class="stat">
+              <div class="stat-head"><span class="stat-label">Backups</span><span class="stat-ico">💾</span></div>
+              <div id="backupCount" class="stat-value grad">-</div>
+              <a href="backup.html">Abrir backups →</a>
+            </div>
+            <div class="stat">
+              <div class="stat-head"><span class="stat-label">Designs gerados</span><span class="stat-ico">📐</span></div>
+              <div id="designCount" class="stat-value grad">-</div>
+              <span class="muted small">design.md salvos no PC</span>
+            </div>
+          </section>
+
+          <section class="widgets">
+            <div class="panel widget w-span-5">
+              <h3 class="panel-title"><span class="dot"></span>Relogio &amp; clima</h3>
+              <div class="w-clock">
+                <div>
+                  <div class="w-time" id="wTime">--:--:--</div>
+                  <div class="w-date" id="wDate"></div>
+                </div>
+                <div class="w-weather" id="wWeather"><div class="cond">carregando...</div></div>
+              </div>
+            </div>
+
+            <div class="panel widget w-span-4 w-pomo">
+              <h3 class="panel-title" style="justify-content:center;"><span class="dot"></span>Pomodoro de foco</h3>
+              <div class="pomo-phase work" id="pomoPhase">Foco · 25 min</div>
+              <div class="pomo-time" id="pomoTime">25:00</div>
+              <div class="pomo-controls">
+                <button id="pomoStart" class="btn btn-primary">▶ Iniciar</button>
+                <button id="pomoReset" class="btn btn-ghost">↺</button>
+              </div>
+              <div class="pomo-dots" id="pomoDots" title="Pomodoros de hoje"></div>
+            </div>
+
+            <div class="panel widget w-span-3">
+              <h3 class="panel-title"><span class="dot"></span>XP &amp; conquistas <span class="xp-streak" style="margin-left:auto;">🔥 <span id="xpStreak">0</span>d</span></h3>
+              <div class="xp-head">
+                <div class="xp-level"><div class="n" id="xpLevel">1</div><div class="l">nivel</div></div>
+                <div class="xp-info">
+                  <div class="xp-line"><span id="xpText">0 / 100 XP</span><span id="xpTotal">0 XP total</span></div>
+                  <div class="xp-bar"><i id="xpFill" style="width:0%"></i></div>
+                </div>
+              </div>
+              <div class="xp-ach" id="xpAch"></div>
+            </div>
+
+            <div class="panel widget w-span-12">
+              <h3 class="panel-title" style="margin-bottom:10px;">
+                <span class="dot"></span>Mural de notas
+                <span class="w-actions"><button id="noteAdd" class="btn btn-ghost" style="padding:6px 13px;font-size:12px;">+ Nova nota</button></span>
+              </h3>
+              <div class="mural" id="mural">
+                <div class="mural-hint">Nenhuma nota ainda. Clique em "+ Nova nota" e arraste os post-its pela tela.</div>
+              </div>
+            </div>
+
+            <div class="panel widget w-span-7">
+              <h3 class="panel-title"><span class="dot"></span>Lista de tarefas</h3>
+              <div id="taskList"></div>
+              <div class="task-add">
+                <input id="taskTitle" type="text" placeholder="Nova tarefa..." style="padding:9px 13px;border-radius:12px;border:1px solid var(--border);background:rgba(8,10,22,.65);color:var(--text);font-family:inherit;font-size:13px;" />
+                <input id="taskDue" type="date" style="padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(8,10,22,.65);color:var(--text);font-family:inherit;font-size:12.5px;" />
+                <button id="taskAdd" class="btn btn-primary">Adicionar</button>
+              </div>
+            </div>
+
+            <div class="panel widget w-span-5">
+              <h3 class="panel-title">
+                <span class="dot"></span>Calendario
+                <span class="w-actions">
+                  <button id="calToday" class="btn btn-ghost" style="padding:5px 11px;font-size:11.5px;">Hoje</button>
+                  <button id="calPrev" class="btn btn-ghost" style="padding:5px 11px;">‹</button>
+                  <button id="calNext" class="btn btn-ghost" style="padding:5px 11px;">›</button>
+                </span>
+              </h3>
+              <div class="cal-title" id="calTitle" style="display:none;"></div>
+              <div class="cal-grid" id="calGrid"></div>
+              <div style="margin-top:14px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.1em;">Eventos de <span id="calSelLabel" style="color:var(--text);"></span></div>
+              <div class="cal-events" id="calEvents"></div>
+              <div class="cal-add">
+                <input id="calInput" type="text" placeholder="Novo evento nesse dia..." style="padding:9px 13px;border-radius:12px;border:1px solid var(--border);background:rgba(8,10,22,.65);color:var(--text);font-family:inherit;font-size:13px;" />
+                <button id="calAdd" class="btn btn-primary">+</button>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="panel-title" style="margin-bottom:14px;"><span class="dot"></span>Acesso rapido</h3>
+            <div class="quick-grid">
+              <a class="quick" href="components.html">
+                <span class="quick-ico">🧩</span>
+                <div><strong>Componentes</strong><span>Biblioteca visual com preview ao vivo e selecao para design.md</span></div>
+              </a>
+              <a class="quick" href="finances.html">
+                <span class="quick-ico">💰</span>
+                <div><strong>Financas</strong><span>Receitas, despesas, metas e gastos fixos</span></div>
+              </a>
+              <a class="quick" href="backup.html">
+                <span class="quick-ico">💾</span>
+                <div><strong>Backup</strong><span>Salve e gerencie arquivos de backup no disco</span></div>
+              </a>
+              <a class="quick" href="files.html">
+                <span class="quick-ico">📁</span>
+                <div><strong>Arquivos</strong><span>Explorador estilo Windows para navegar pelo PC</span></div>
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="qrModal" class="modal hidden">
+    <div class="modal-card" style="max-width:420px;text-align:center;">
+      <div class="modal-header">
+        <h3>📱 Abrir no celular</h3>
+        <button id="qrClose" class="icon-btn">✕</button>
+      </div>
+      <p class="muted small" style="margin:0;">Conecte o celular no mesmo Wi-Fi e escaneie o QR code:</p>
+      <div id="qrBox" style="display:grid;place-items:center;background:#fff;border-radius:14px;padding:16px;min-height:242px;"></div>
+      <code id="qrUrl" style="font-size:12.5px;color:var(--accent-2);">-</code>
+      <button id="qrCopy" class="btn btn-ghost">Copiar link</button>
+    </div>
+  </div>
+
+  <script>
+    fetch('/api/components?limit=1').then(r => r.json()).then(d => {
+      document.getElementById('compCount').textContent = d.total || 0;
+    }).catch(() => {});
+    fetch('/api/finances').then(r => r.json()).then(items => {
+      const b = items.reduce((a, i) => a + (i.type === 'income' ? i.amount : -i.amount), 0);
+      const el = document.getElementById('balance');
+      el.textContent = 'R$ ' + b.toFixed(2);
+      el.classList.add(b >= 0 ? 'money-pos' : 'money-neg');
+    }).catch(() => {});
+    fetch('/api/backup').then(r => r.json()).then(list => {
+      document.getElementById('backupCount').textContent = list.length || 0;
+    }).catch(() => {});
+    fetch('/api/designs').then(r => r.json()).then(list => {
+      document.getElementById('designCount').textContent = list.length || 0;
+    }).catch(() => {});
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="stars-bg.js"></script>
+  <script src="notifications.js"></script>
+  <script src="home.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>

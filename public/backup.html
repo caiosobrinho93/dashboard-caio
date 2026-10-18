@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Backup</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">💾</span>
+        <div>
+          <h1>Dashboard Caio 2.0</h1>
+          <p>Backup</p>
+        </div>
+      </div>
+      <div class="nav-label">Menu principal</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link"><span class="nav-ico">🏠</span><span>Inicio</span></a>
+        <a href="components.html" class="nav-link"><span class="nav-ico">🧩</span><span>Componentes</span></a>
+        <a href="finances.html" class="nav-link"><span class="nav-ico">💰</span><span>Financas</span></a>
+        <a href="backup.html" class="nav-link active"><span class="nav-ico">💾</span><span>Backup</span></a>
+        <a href="files.html" class="nav-link"><span class="nav-ico">📁</span><span>Arquivos</span></a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>Backup</h2>
+          <p class="muted">Salve arquivos de backup direto no disco</p>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <div class="fin-grid">
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Novo backup</h3>
+              <div class="form-row" style="margin-bottom:14px;">
+                <label>Nome do arquivo</label>
+                <input id="bname" placeholder="backup.txt" />
+              </div>
+              <div class="form-row">
+                <label>Conteudo</label>
+                <textarea id="bcontent" rows="10" placeholder="Cole aqui o conteudo do backup..."></textarea>
+              </div>
+              <div class="form-actions" style="margin-top:16px;">
+                <button id="bsave" class="btn btn-primary full">💾 Salvar backup</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3 class="panel-title"><span class="dot"></span>Backups salvos <span id="bcount" class="muted small" style="margin-left:6px;font-weight:500;"></span></h3>
+              <div id="blist" class="list-stack"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    async function load() {
+      const files = await fetch('/api/backup').then(r => r.json());
+      const list = document.getElementById('blist');
+      document.getElementById('bcount').textContent = files.length ? `(${files.length})` : '';
+      list.innerHTML = '';
+      if (!files.length) {
+        list.innerHTML = '<div class="empty">Nenhum backup salvo ainda.</div>';
+        return;
+      }
+      for (const f of files) {
+        const row = document.createElement('div');
+        row.className = 'file-row';
+        row.innerHTML = `
+          <div class="file-info">
+            <div class="file-name">📄 ${escapeHtml(f.name)}</div>
+            <div class="file-size">${f.size} bytes</div>
+          </div>
+          <div class="tx-right">
+            <button class="btn btn-ghost" data-act="view">Ver</button>
+            <button class="icon-btn" data-act="del" title="Excluir">✕</button>
+          </div>`;
+        row.querySelector('[data-act="del"]').addEventListener('click', async () => {
+          if (!confirm('Excluir "' + f.name + '"?')) return;
+          await fetch('/api/backup/' + encodeURIComponent(f.name), { method: 'DELETE' });
+          load();
+        });
+        row.querySelector('[data-act="view"]').addEventListener('click', async () => {
+          const res = await fetch('/api/files?path=' + encodeURIComponent('backups/' + f.name));
+          const data = await res.json();
+          document.getElementById('fileModalTitle').textContent = f.name;
+          document.getElementById('fileModalContent').textContent = data.content || '(vazio)';
+          document.getElementById('fileModal').classList.remove('hidden');
+        });
+        list.appendChild(row);
+      }
+    }
+    document.getElementById('bsave').addEventListener('click', async () => {
+      const name = document.getElementById('bname').value.trim();
+      if (!name) { alert('Informe o nome do arquivo.'); return; }
+      const body = { name, content: document.getElementById('bcontent').value };
+      await fetch('/api/backup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      document.getElementById('bname').value = '';
+      document.getElementById('bcontent').value = '';
+      load();
+    });
+    load();
+  </script>
+
+  <div id="fileModal" class="modal hidden">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3 id="fileModalTitle">Backup</h3>
+        <button class="icon-btn" onclick="document.getElementById('fileModal').classList.add('hidden')">✕</button>
+      </div>
+      <pre id="fileModalContent" class="code-block" style="max-height:60vh;"></pre>
+    </div>
+  </div>
+
+  <script src="stars-bg.js"></script>
+  <script src="notifications.js"></script>
+  <script src="intro.js"></script>
+</body>
+</html>

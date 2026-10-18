@@ -1,0 +1,15 @@
+{
+  "name": "design-vault",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dashboard para salvar componentes dev e gerar design.md",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
