@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Caio 2.0 — Entrar</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { display: grid; place-items: center; min-height: 100vh; padding: 24px; }
+    .login-card {
+      width: min(420px, 100%);
+      background: linear-gradient(180deg, rgba(23, 27, 48, 0.92), rgba(11, 14, 27, 0.94));
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      padding: 34px 30px 28px;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6), 0 0 60px rgba(124, 92, 255, 0.12);
+      position: relative;
+      z-index: 2;
+    }
+    .login-logo {
+      width: 62px; height: 62px; border-radius: 20px; display: grid; place-items: center;
+      font-size: 30px; background: var(--grad); margin: 0 auto 18px;
+      box-shadow: 0 12px 40px rgba(124, 92, 255, 0.5);
+    }
+    .login-card h1 { font-size: 21px; text-align: center; margin: 0 0 6px; }
+    .login-card .sub { text-align: center; color: var(--muted); font-size: 12.5px; margin: 0 0 24px; }
+    .login-card label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 700; }
+    .login-card input { width: 100%; margin-top: 8px; padding: 13px 15px; font-size: 15px; }
+    .login-card .btn { width: 100%; margin-top: 18px; padding: 13px; font-size: 14px; }
+    .login-err {
+      display: none; margin-top: 14px; padding: 11px 14px; border-radius: 12px;
+      background: rgba(251, 113, 133, 0.12); border: 1px solid rgba(251, 113, 133, 0.4);
+      color: #ffb3c1; font-size: 12.5px; text-align: center;
+    }
+    .login-err.show { display: block; }
+    .login-foot { text-align: center; color: var(--muted); font-size: 11px; margin-top: 22px; }
+  </style>
+</head>
+<body>
+  <canvas id="stars" class="stars-bg"></canvas>
+
+  <form class="login-card" id="form">
+    <div class="login-logo">🧩</div>
+    <h1>Dashboard Caio 2.0</h1>
+    <p class="sub">Area protegida — digite a senha para entrar.</p>
+    <label for="pw">Senha</label>
+    <input id="pw" type="password" autocomplete="current-password" autofocus />
+    <button class="btn btn-primary" type="submit">Entrar →</button>
+    <div class="login-err" id="err"></div>
+    <div class="login-foot">Sessao valida por 7 dias neste navegador.</div>
+  </form>
+
+  <script src="stars-bg.js"></script>
+  <script>
+    const err = document.getElementById('err');
+    function showErr(msg) { err.textContent = msg; err.classList.add('show'); }
+
+    fetch('/api/me').then(r => {
+      if (r.ok) location.replace('/');
+      else if (r.status === 503) showErr('Servidor bloqueado: configure a senha (DASHBOARD_PASSWORD) na Vercel.');
+    }).catch(() => {});
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('pw').value;
+      if (!password) return;
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        if (res.ok) { location.replace('/'); return; }
+        if (res.status === 503) { showErr('Servidor bloqueado: configure a senha na Vercel.'); return; }
+        showErr('Senha incorreta. Tente de novo.');
+        document.getElementById('pw').select();
+      } catch (e2) {
+        showErr('Nao foi possivel conectar. Tente novamente.');
+      }
+    });
+  </script>
+</body>
+</html>
