@@ -2,10 +2,53 @@
 
 /* Comunidades — listar, criar, entrar/sair */
 (async function () {
-  const ctx = await Social.auth();
-  if (!ctx) return;
   const sb = Social.sb;
   const $ = (id) => document.getElementById(id);
+  const ready = Social.authOnce();
+
+  /* o botao de criar ja responde, mesmo se clicarem antes do login terminar */
+  $("btnCreateComm").addEventListener("click", async () => {
+    const ctx = await ready;
+    if (!ctx) return;
+    const name = $("cName").value.trim();
+    if (name.length < 3) return Social.toast("Digite um nome com pelo menos 3 letras.", true);
+
+    const base = slugify(name);
+    let slug = base;
+    for (let i = 0; i < 3; i++) {
+      const { data: exists } = await sb.from("communities").select("id").eq("slug", slug).maybeSingle();
+      if (!exists) break;
+      slug = base + "-" + Math.random().toString(36).slice(2, 6);
+    }
+
+    const { data: created, error } = await sb
+      .from("communities")
+      .insert({
+        slug,
+        name,
+        description: $("cDesc").value.trim() || null,
+        city: $("cCity").value.trim() || null,
+        created_by: ctx.user.id
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (Social.setupNeeded(error)) Social.showSetupBanner();
+      else Social.toast("Nao deu para criar: " + error.message, true);
+      return;
+    }
+
+    await sb.from("community_members").insert({ community_id: created.id, user_id: ctx.user.id, role: "admin" });
+    $("cName").value = "";
+    $("cDesc").value = "";
+    $("cCity").value = "";
+    Social.toast("Comunidade criada! 🎉");
+    await load();
+  });
+
+  const ctx = await ready;
+  if (!ctx) return;
 
   Social.shell(ctx, {
     title: "Comunidades",
@@ -81,44 +124,6 @@
       if (error) Social.toast(error.message, true);
     }
     btn.disabled = false;
-    await load();
-  });
-
-  $("btnCreateComm").addEventListener("click", async () => {
-    const name = $("cName").value.trim();
-    if (name.length < 3) return Social.toast("Digite um nome com pelo menos 3 letras.", true);
-
-    const base = slugify(name);
-    let slug = base;
-    for (let i = 0; i < 3; i++) {
-      const { data: exists } = await sb.from("communities").select("id").eq("slug", slug).maybeSingle();
-      if (!exists) break;
-      slug = base + "-" + Math.random().toString(36).slice(2, 6);
-    }
-
-    const { data: created, error } = await sb
-      .from("communities")
-      .insert({
-        slug,
-        name,
-        description: $("cDesc").value.trim() || null,
-        city: $("cCity").value.trim() || null,
-        created_by: ctx.user.id
-      })
-      .select()
-      .single();
-
-    if (error) {
-      if (Social.setupNeeded(error)) Social.showSetupBanner();
-      else Social.toast("Nao deu para criar: " + error.message, true);
-      return;
-    }
-
-    await sb.from("community_members").insert({ community_id: created.id, user_id: ctx.user.id, role: "admin" });
-    $("cName").value = "";
-    $("cDesc").value = "";
-    $("cCity").value = "";
-    Social.toast("Comunidade criada! 🎉");
     await load();
   });
 

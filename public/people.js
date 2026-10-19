@@ -2,10 +2,24 @@
 
 /* Pessoas — diretorio de profissionais com busca e seguir/deixar de seguir */
 (async function () {
-  const ctx = await Social.auth();
-  if (!ctx) return;
   const sb = Social.sb;
   const $ = (id) => document.getElementById(id);
+  const ready = Social.authOnce();
+  let following = new Set();
+
+  /* a busca ja responde, mesmo se digitarem antes do login terminar */
+  let timer = null;
+  $("q").addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const ctx = await ready;
+      if (!ctx) return;
+      load($("q").value);
+    }, 300);
+  });
+
+  const ctx = await ready;
+  if (!ctx) return;
 
   Social.shell(ctx, {
     title: "Pessoas",
@@ -14,7 +28,7 @@
   });
 
   const grid = $("peopleGrid");
-  let following = new Set(await Social.myFollowingIds());
+  following = new Set(await Social.myFollowingIds());
 
   function personCard(p) {
     const isFollowing = following.has(p.id);
@@ -77,12 +91,6 @@
     else following.add(id);
     btn.classList.toggle("on", !on);
     btn.textContent = on ? "Seguir" : "Seguindo";
-  });
-
-  let timer = null;
-  $("q").addEventListener("input", () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => load($("q").value), 300);
   });
 
   await load("");

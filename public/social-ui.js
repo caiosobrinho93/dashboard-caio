@@ -136,6 +136,12 @@ window.Social = (function () {
     location.replace("social-login.html");
   }
 
+  let authPromise = null;
+  function authOnce() {
+    if (!authPromise) authPromise = auth();
+    return authPromise;
+  }
+
   function user() { return current.user; }
   function me() { return current.profile; }
 
@@ -508,6 +514,7 @@ window.Social = (function () {
     showSetupBanner,
     selectIn,
     auth,
+    authOnce,
     signOut,
     user,
     me,

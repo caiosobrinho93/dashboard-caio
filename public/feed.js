@@ -2,19 +2,37 @@
 
 /* Feed principal — todos / seguindo / meus posts + composer */
 (async function () {
-  const ctx = await Social.auth();
-  if (!ctx) return;
   const sb = Social.sb;
   const $ = (id) => document.getElementById(id);
+  const ready = Social.authOnce();
+
+  const feed = $("feed");
+  const state = { filter: "all", offset: 0, limit: 10, done: false, following: [] };
+
+  /* abas e "carregar mais" ja respondem, mesmo antes do login terminar */
+  document.querySelectorAll("#feedTabs .seg-btn").forEach((b) => {
+    b.addEventListener("click", async () => {
+      if (!(await ready)) return;
+      document.querySelectorAll("#feedTabs .seg-btn").forEach((x) => x.classList.toggle("active", x === b));
+      state.filter = b.dataset.filter;
+      if (state.filter === "following") state.following = await Social.myFollowingIds();
+      load(true);
+    });
+  });
+
+  $("btnMore").addEventListener("click", async () => {
+    if (!(await ready)) return;
+    load(false);
+  });
+
+  const ctx = await ready;
+  if (!ctx) return;
 
   Social.shell(ctx, {
     title: "Feed",
     sub: "O que os profissionais da regiao estao compartilhando",
     active: "feed.html"
   });
-
-  const feed = $("feed");
-  const state = { filter: "all", offset: 0, limit: 10, done: false, following: [] };
 
   $("composerAvatar").innerHTML = Social.avatarHtml(ctx.profile, 40);
   $("composer").hidden = false;
@@ -99,17 +117,6 @@
     }
     $("btnMore").hidden = state.done;
   }
-
-  document.querySelectorAll("#feedTabs .seg-btn").forEach((b) => {
-    b.addEventListener("click", async () => {
-      document.querySelectorAll("#feedTabs .seg-btn").forEach((x) => x.classList.toggle("active", x === b));
-      state.filter = b.dataset.filter;
-      if (state.filter === "following") state.following = await Social.myFollowingIds();
-      load(true);
-    });
-  });
-
-  $("btnMore").addEventListener("click", () => load(false));
 
   Social.bindFeed(feed, ctx.user);
   await load(true);
