@@ -21,8 +21,11 @@ window.Social = (function () {
 
   function initials(name) {
     const parts = String(name || "?").trim().split(/\s+/).filter(Boolean);
-    const a = (parts[0] || "?")[0] || "?";
-    const b = parts[1] ? parts[1][0] : "";
+    const skip = /^(de|da|do|das|dos|e)$/i;
+    const sig = parts.filter((p) => !skip.test(p));
+    const base = sig.length ? sig : parts;
+    const a = (base[0] || "?")[0] || "?";
+    const b = base[1] ? base[1][0] : "";
     return (a + b).toUpperCase();
   }
 
@@ -427,7 +430,8 @@ window.Social = (function () {
       if (error) return toast(error.message, true);
 
       data.author_profile = current.profile;
-      form.querySelector(".comment-list").insertAdjacentHTML("beforeend", commentHtml(data, viewerId));
+      const list = card.querySelector(".comment-list");
+      if (list) list.insertAdjacentHTML("beforeend", commentHtml(data, viewerId));
       input.value = "";
       bumpCount(card, ".js-comment-count", 1);
     });
