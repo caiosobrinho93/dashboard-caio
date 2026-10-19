@@ -1,0 +1,174 @@
+/* ============================================================
+   Magic Bento — adaptado do React Bits para o Dashboard Caio 2.0
+   Spotlight que segue o mouse, borda luminosa, tilt 3D,
+   partículas e onda ao clicar. Sem dependências.
+   ============================================================ */
+
+.mb-card {
+  --mb-glow-rgb: 124, 92, 255;
+  --mb-x: -999px;
+  --mb-y: -999px;
+  --mb-hot: 0;
+  --mb-near: 0;
+  --mb-rx: 0deg;
+  --mb-ry: 0deg;
+  --mb-press: 1;
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  transform-origin: center;
+}
+
+/* luz que segue o cursor */
+.mb-light {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    320px circle at var(--mb-x) var(--mb-y),
+    rgba(var(--mb-glow-rgb), 0.18) 0%,
+    rgba(var(--mb-glow-rgb), 0.12) 26%,
+    rgba(var(--mb-glow-rgb), 0.06) 48%,
+    rgba(var(--mb-glow-rgb), 0.02) 66%,
+    rgba(var(--mb-glow-rgb), 0) 78%
+  );
+  opacity: var(--mb-hot);
+  transition: opacity 0.35s ease;
+}
+
+/* na home (cards escuros) a luz soma e fica mais viva */
+.stat.mb-card .mb-light {
+  mix-blend-mode: screen;
+}
+
+/* partículas */
+.mb-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.mb-card.mb-hover .mb-stars {
+  opacity: 1;
+}
+
+/* aro interno sutil */
+.mb-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* borda que acende perto do cursor */
+.mb-border {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  box-sizing: border-box;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    240px circle at var(--mb-x) var(--mb-y),
+    rgba(var(--mb-glow-rgb), 1) 0%,
+    rgba(var(--mb-glow-rgb), 0.75) 18%,
+    rgba(var(--mb-glow-rgb), 0.4) 38%,
+    rgba(var(--mb-glow-rgb), 0.14) 60%,
+    rgba(var(--mb-glow-rgb), 0) 78%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: var(--mb-near);
+  transition: opacity 0.3s ease;
+}
+
+/* conteúdo acima da luz */
+.mb-card > *:not(.mb-light):not(.mb-stars):not(.mb-rim):not(.mb-border):not(.mb-wave) {
+  position: relative;
+  z-index: 1;
+}
+
+/* onda ao clicar */
+.mb-wave {
+  position: absolute;
+  z-index: 5;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid rgba(var(--mb-glow-rgb), 0.9);
+  background: radial-gradient(circle, rgba(var(--mb-glow-rgb), 0.45) 0%, rgba(var(--mb-glow-rgb), 0) 70%);
+  animation: mbWave 0.7s cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
+}
+@keyframes mbWave {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: scale(42);
+    opacity: 0;
+  }
+}
+
+/* tilt 3D — usado nos cards de estatísticas da home */
+.mb-card.mb-tilt {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s,
+    box-shadow 0.22s;
+  transform: perspective(900px) rotateX(var(--mb-rx)) rotateY(var(--mb-ry)) scale(var(--mb-press));
+  will-change: transform;
+}
+.stat.mb-card.mb-tilt:hover {
+  transform: perspective(900px) rotateX(var(--mb-rx)) rotateY(var(--mb-ry)) translateY(-3px) scale(var(--mb-press));
+  border-color: rgba(var(--mb-glow-rgb), 0.45);
+}
+
+/* brilho externo enquanto o mouse está no card */
+.mb-card.mb-hover {
+  box-shadow:
+    0 26px 56px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(var(--mb-glow-rgb), 0.35),
+    0 0 42px rgba(var(--mb-glow-rgb), 0.18);
+}
+.stat.mb-card.mb-hover {
+  box-shadow:
+    0 26px 56px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(var(--mb-glow-rgb), 0.4),
+    0 0 48px rgba(var(--mb-glow-rgb), 0.26);
+}
+
+/* o preview continua abrindo pelo card, mas sem roubar o mouse do efeito */
+.mb-card .card-preview iframe {
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mb-light,
+  .mb-stars,
+  .mb-border,
+  .mb-wave {
+    display: none;
+  }
+  .mb-card.mb-tilt {
+    transform: none !important;
+  }
+}
