@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil — Rede dos Trabalhadores</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="neon.css" />
+  <link rel="stylesheet" href="social.css" />
+</head>
+<body>
+  <div class="neon-bg" aria-hidden="true"><div class="aurora"></div><div class="rays"></div><div class="grid-floor"></div><div class="flash"></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sideNav"></aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Perfil</h2>
+          <p class="muted" id="pageSub">Informacoes do profissional</p>
+        </div>
+        <div class="topbar-actions" id="topActions"></div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <div id="profileBox"></div>
+
+          <section class="panel" id="editPanel" hidden style="margin-bottom:20px;">
+            <h3 class="panel-title"><span class="dot"></span>Editar perfil</h3>
+            <div class="edit-grid">
+              <div><label>Nome completo</label><input id="eName" maxlength="80" /></div>
+              <div><label>Usuario (@)</label><input id="eUser" maxlength="24" /></div>
+              <div>
+                <label>Profissao</label>
+                <select id="eTrade"></select>
+              </div>
+              <div><label>Cidade / regiao</label><input id="eCity" maxlength="60" /></div>
+              <div class="full"><label>Bio</label><textarea id="eBio" rows="3" maxlength="400" placeholder="Conte o que voce faz, especialidades, contato..."></textarea></div>
+              <div class="full"><label>Foto de perfil</label><input id="eAvatar" type="file" accept="image/*" /></div>
+            </div>
+            <div style="margin-top:14px;display:flex;gap:10px;">
+              <button class="btn btn-primary" id="btnSaveProfile">Salvar</button>
+              <button class="btn btn-ghost" id="btnCancelEdit">Cancelar</button>
+            </div>
+          </section>
+
+          <div class="seg" id="profileTabs">
+            <button class="seg-btn active" data-tab="posts">Publicacoes</button>
+            <button class="seg-btn" data-tab="followers">Seguidores</button>
+            <button class="seg-btn" data-tab="following">Seguindo</button>
+          </div>
+
+          <div id="profileContent"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="social-config.js"></script>
+  <script src="social-ui.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

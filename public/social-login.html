@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — Rede dos Trabalhadores</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="neon.css" />
+  <link rel="stylesheet" href="social.css" />
+</head>
+<body class="social-auth-page">
+  <div class="neon-bg" aria-hidden="true"><div class="aurora"></div><div class="rays"></div><div class="grid-floor"></div><div class="flash"></div></div>
+
+  <form class="social-auth-card" id="form">
+    <div class="social-auth-logo">🛠️</div>
+    <h1 id="authTitle">Rede dos Trabalhadores</h1>
+    <p class="sub" id="authSub">Entre para ver o feed, comunidades e contatos da regiao.</p>
+
+    <div class="seg" id="modeTabs" style="margin:0 0 6px;display:flex;">
+      <button type="button" class="seg-btn active" data-mode="login" style="flex:1;">Entrar</button>
+      <button type="button" class="seg-btn" data-mode="signup" style="flex:1;">Criar conta</button>
+    </div>
+
+    <div id="signupFields" hidden>
+      <label for="name">Nome completo</label>
+      <input id="name" autocomplete="name" placeholder="Como voce quer aparecer" />
+
+      <label for="user">Usuario (@)</label>
+      <input id="user" autocomplete="username" placeholder="sem espacos. ex: joao_marceneiro" />
+
+      <label for="trade">Profissao</label>
+      <select id="trade"></select>
+
+      <label for="city">Cidade / regiao</label>
+      <input id="city" autocomplete="address-level2" placeholder="Sua cidade" />
+    </div>
+
+    <label for="email">E-mail</label>
+    <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" />
+
+    <label for="pw">Senha</label>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="minimo 6 caracteres" />
+
+    <button class="btn btn-primary" type="submit" id="btnSubmit">Entrar →</button>
+    <div class="social-msg" id="msg"></div>
+    <div class="social-auth-foot">
+      Seus dados ficam no Supabase. <a href="index.html" style="color:var(--accent-2);">Voltar ao painel</a>
+    </div>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="social-config.js"></script>
+  <script src="social-ui.js"></script>
+  <script src="social-login.js"></script>
+</body>
+</html>

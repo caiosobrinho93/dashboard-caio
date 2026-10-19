@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pessoas — Rede dos Trabalhadores</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="neon.css" />
+  <link rel="stylesheet" href="social.css" />
+</head>
+<body>
+  <div class="neon-bg" aria-hidden="true"><div class="aurora"></div><div class="rays"></div><div class="grid-floor"></div><div class="flash"></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sideNav"></aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Pessoas</h2>
+          <p class="muted" id="pageSub">Encontre profissionais da sua regiao</p>
+        </div>
+        <div class="topbar-actions" id="topActions"></div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <div class="people-tools">
+            <input id="q" type="text" placeholder="Buscar por nome, profissao ou cidade..." />
+          </div>
+          <div class="people-grid" id="peopleGrid"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="social-config.js"></script>
+  <script src="social-ui.js"></script>
+  <script src="people.js"></script>
+</body>
+</html>

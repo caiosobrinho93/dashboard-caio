@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comunidades — Rede dos Trabalhadores</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="neon.css" />
+  <link rel="stylesheet" href="social.css" />
+</head>
+<body>
+  <div class="neon-bg" aria-hidden="true"><div class="aurora"></div><div class="rays"></div><div class="grid-floor"></div><div class="flash"></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sideNav"></aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Comunidades</h2>
+          <p class="muted" id="pageSub">Grupos por profissao, cidade ou assunto</p>
+        </div>
+        <div class="topbar-actions" id="topActions"></div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <section class="panel" style="margin-bottom:20px;">
+            <h3 class="panel-title"><span class="dot"></span>Criar comunidade</h3>
+            <div class="edit-grid">
+              <div><label>Nome</label><input id="cName" placeholder="Marceneiros da Zona Norte" maxlength="60" /></div>
+              <div><label>Cidade / regiao</label><input id="cCity" placeholder="Sua cidade" maxlength="60" /></div>
+              <div class="full"><label>Descricao</label><textarea id="cDesc" rows="2" maxlength="300" placeholder="Sobre o que e essa comunidade?"></textarea></div>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-primary" id="btnCreateComm">Criar comunidade</button>
+            </div>
+          </section>
+
+          <div class="community-grid" id="commGrid"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="social-config.js"></script>
+  <script src="social-ui.js"></script>
+  <script src="communities.js"></script>
+</body>
+</html>

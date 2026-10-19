@@ -92,4 +92,46 @@ node migrate.js
 ### Variaveis de ambiente
 
 Copie `.env.example` para `.env` se quiser testar o login localmente. Nenhuma variavel e obrigatoria no PC.
+
+## Rede social (perfis, feed, comunidades, comentarios)
+
+A partir de agora o projeto tambem tem uma rede social para trabalhadores da regiao,
+inspirada em Facebook/Instagram, usando o mesmo Supabase (com Supabase Auth).
+
+### Como ativar (uma vez)
+
+1. No Supabase: **SQL Editor** → cole e rode o arquivo [`supabase/social.sql`](supabase/social.sql).
+   Ele cria: `profiles`, `communities`, `community_members`, `posts`, `comments`, `likes`, `follows`,
+   os indices, as policies (RLS) e os buckets de fotos (`posts`, `avatars`).
+2. Ainda no Supabase: **Authentication → Providers → Email** habilitado.
+   - Para entrar na hora (recomendado para testar): desligue **Confirm email** em Authentication → Sign In / Up.
+   - Se manter ligado, o usuario recebe um e-mail de confirmacao. Configure tambem
+     **Authentication → URL Configuration → Site URL** com a URL do site (Vercel).
+3. Abra `https://SEU-SITE.vercel.app/social-login.html` (ou `http://localhost:3000/social-login.html`),
+   crie sua conta e comece a usar.
+
+### Paginas
+
+| Arquivo | O que faz |
+| --- | --- |
+| `social-login.html` | Entrar / criar conta (Supabase Auth) |
+| `feed.html` | Feed com filtros (Todos / Seguindo / Meus posts), publicar com foto |
+| `communities.html` | Listar e criar comunidades, entrar/sair |
+| `community.html?slug=...` | Pagina da comunidade com feed proprio |
+| `people.html` | Diretorio de profissionais com busca e seguir/deixar de seguir |
+| `profile.html` | Perfil (posts, seguidores, seguindo) e editar perfil com foto |
+
+O painel antigo continua igual (senha do dashboard). A sidebar dele ganhou um atalho "Rede social".
+
+### Configuracao do cliente
+
+`public/social-config.js` guarda a URL e a chave PUBLISHABLE do Supabase (segura para o navegador,
+a protecao real e via RLS) e a lista de profissoes. Troque ali o `appName` para mudar o nome da rede.
+
+### Regras de privacidade (RLS)
+
+- Leitura: publica (qualquer visitante ve perfis, posts, comunidades e comentarios).
+- Escrita: so o dono — `auth.uid()` precisa bater com autor/dono da linha.
+- Fotos: qualquer pessoa autenticada envia para os buckets `posts`/`avatars`; so o dono apaga.
+
 ```

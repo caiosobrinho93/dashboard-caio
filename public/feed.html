@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feed — Rede dos Trabalhadores</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="neon.css" />
+  <link rel="stylesheet" href="social.css" />
+</head>
+<body>
+  <div class="neon-bg" aria-hidden="true"><div class="aurora"></div><div class="rays"></div><div class="grid-floor"></div><div class="flash"></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sideNav"></aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Feed</h2>
+          <p class="muted" id="pageSub">O que os profissionais da regiao estao compartilhando</p>
+        </div>
+        <div class="topbar-actions" id="topActions"></div>
+      </header>
+
+      <div class="page">
+        <div class="page-inner">
+          <section class="panel composer" id="composer" hidden>
+            <div class="composer-head">
+              <span class="composer-avatar" id="composerAvatar"></span>
+              <textarea id="postText" placeholder="Compartilhe um trabalho, uma duvida, uma novidade..."></textarea>
+            </div>
+            <div class="composer-foot">
+              <label class="file-btn">📷 Foto<input type="file" id="postImage" accept="image/*" hidden /></label>
+              <span id="imgName" class="muted small"></span>
+              <select id="postCommunity"><option value="">Sem comunidade</option></select>
+              <span class="spacer"></span>
+              <button class="btn btn-primary" id="btnPost">Publicar</button>
+            </div>
+            <div class="composer-preview" id="imgPreview" hidden></div>
+          </section>
+
+          <div class="seg" id="feedTabs">
+            <button class="seg-btn active" data-filter="all">Todos</button>
+            <button class="seg-btn" data-filter="following">Seguindo</button>
+            <button class="seg-btn" data-filter="mine">Meus posts</button>
+          </div>
+
+          <div id="feed"></div>
+
+          <div style="text-align:center;margin:6px 0 30px;">
+            <button class="btn btn-ghost" id="btnMore" hidden>Carregar mais</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="social-config.js"></script>
+  <script src="social-ui.js"></script>
+  <script src="feed.js"></script>
+</body>
+</html>
