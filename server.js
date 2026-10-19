@@ -258,6 +258,21 @@ async function profilePayload() {
 const app = express();
 app.use(express.json({ limit: "5mb" }));
 
+// rota "plana" usada pelo cliente em hospedagem serverless (Vercel): /api/dyn?p=recurso/id
+app.use((req, _res, next) => {
+  if (req.path === "/api/dyn" && typeof req.query.p === "string" && req.query.p) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(req.query)) {
+      if (key === "p") continue;
+      if (Array.isArray(value)) value.forEach((v) => params.append(key, v));
+      else if (value != null) params.append(key, value);
+    }
+    const qs = params.toString();
+    req.url = "/api/" + req.query.p.replace(/^\/+/, "") + (qs ? "?" + qs : "");
+  }
+  next();
+});
+
 // bloqueio de seguranca: na nuvem sem senha configurada ninguem entra
 app.use((req, res, next) => {
   if (storage.isCloud && !auth.enabled()) {
