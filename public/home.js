@@ -17,6 +17,7 @@ function renderProfile(p) {
   $("xpTotal").textContent = `${p.xp} XP total`;
   $("xpFill").style.width = Math.min(100, (p.xpInLevel / p.xpNeeded) * 100) + "%";
   $("xpStreak").textContent = p.streakDays;
+  if (window.DashNeonProfile) window.DashNeonProfile(p);
   $("xpAch").innerHTML = p.achievements
     .map((a) => `<span class="ach ${a.unlockedAt ? "" : "locked"}" title="${esc(a.name)} — ${esc(a.desc)}">${a.icon}</span>`)
     .join("");

@@ -6,6 +6,7 @@
   <title>Dashboard Caio 2.0 — Inicio</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="magic-bento.css" />
+  <link rel="stylesheet" href="neon.css" />
 </head>
 <body>
   <div class="layout">
@@ -41,12 +42,65 @@
       <div class="page">
         <div class="page-inner">
           <section class="hero">
-            <h2>Sua central de componentes,<br>design e produtividade.</h2>
-            <p>Salve componentes visuais, gere um design.md completo para IA construir seus apps, controle financas, backups e navegue pelos arquivos do PC — tudo em um so lugar.</p>
-            <div class="hero-actions">
-              <a href="components.html" class="btn btn-primary" style="text-decoration:none;">🧩 Explorar componentes</a>
-              <a href="components.html" class="btn btn-ghost" style="text-decoration:none;">Gerar design.md</a>
+            <div class="hero-grid">
+              <div class="hero-copy">
+                <span class="hero-badge"><i></i> Neon edition · 2.0</span>
+                <h2>Sua central de <em>componentes</em>, design e produtividade.</h2>
+                <p>Salve componentes visuais, gere um design.md completo para IA construir seus apps, controle finanças, backups e navegue pelos arquivos do PC — tudo em um só lugar.</p>
+                <div class="hero-actions">
+                  <a href="components.html" class="btn btn-primary" style="text-decoration:none;">🧩 Explorar componentes</a>
+                  <a href="components.html" class="btn btn-ghost" style="text-decoration:none;">Gerar design.md</a>
+                </div>
+                <div class="hero-meta">
+                  <span class="chip"><b>⚡</b> neon ui</span>
+                  <span class="chip"><b>🔒</b> acesso protegido</span>
+                  <span class="chip"><b>🧩</b> vault pessoal</span>
+                </div>
+              </div>
+
+              <div class="profile-card">
+                <div class="pc-head">
+                  <div class="pc-avatar">C<span class="pc-live"></span></div>
+                  <div class="pc-id">
+                    <b>Caio Sobrinho</b>
+                    <small>Criador · Dashboard 2.0</small>
+                  </div>
+                </div>
+                <div class="pc-stats">
+                  <div><b id="pcLevel">1</b><span>nível</span></div>
+                  <div><b id="pcXp">0</b><span>XP</span></div>
+                  <div><b id="pcStreak">0</b><span>dias</span></div>
+                </div>
+                <div class="pc-bar"><i id="pcFill" style="width:0%"></i></div>
+                <div class="pc-foot">
+                  <span class="pc-online"><i></i> online</span>
+                  <a href="components.html">ver vault →</a>
+                </div>
+              </div>
             </div>
+          </section>
+
+          <section class="card-nav">
+            <a href="components.html" class="cn-item">
+              <span class="cn-ico">🧩</span>
+              <span><b>Componentes</b><small>Explorar o vault</small></span>
+              <span class="cn-arrow">↗</span>
+            </a>
+            <a href="components.html" class="cn-item">
+              <span class="cn-ico">🎨</span>
+              <span><b>Design.md</b><small>Gerar prompt para IA</small></span>
+              <span class="cn-arrow">↗</span>
+            </a>
+            <a href="finances.html" class="cn-item">
+              <span class="cn-ico">💰</span>
+              <span><b>Finanças</b><small>Saldo, metas e gastos</small></span>
+              <span class="cn-arrow">↗</span>
+            </a>
+            <a href="backup.html" class="cn-item">
+              <span class="cn-ico">💾</span>
+              <span><b>Backup</b><small>Salvar e restaurar</small></span>
+              <span class="cn-arrow">↗</span>
+            </a>
           </section>
 
           <section class="stats">
@@ -147,27 +201,10 @@
             </div>
           </section>
 
-          <section>
-            <h3 class="panel-title" style="margin-bottom:14px;"><span class="dot"></span>Acesso rapido</h3>
-            <div class="quick-grid">
-              <a class="quick" href="components.html">
-                <span class="quick-ico">🧩</span>
-                <div><strong>Componentes</strong><span>Biblioteca visual com preview ao vivo e selecao para design.md</span></div>
-              </a>
-              <a class="quick" href="finances.html">
-                <span class="quick-ico">💰</span>
-                <div><strong>Financas</strong><span>Receitas, despesas, metas e gastos fixos</span></div>
-              </a>
-              <a class="quick" href="backup.html">
-                <span class="quick-ico">💾</span>
-                <div><strong>Backup</strong><span>Salve e gerencie arquivos de backup no disco</span></div>
-              </a>
-              <a class="quick" href="files.html">
-                <span class="quick-ico">📁</span>
-                <div><strong>Arquivos</strong><span>Explorador estilo Windows para navegar pelo PC</span></div>
-              </a>
-            </div>
-          </section>
+          <footer class="neon-footer">
+            <span>⚡ Dashboard Caio 2.0</span>
+            <span>Aurora · Magic Bento · React Bits</span>
+          </footer>
         </div>
       </div>
     </main>
@@ -207,6 +244,7 @@
   <script src="auth.js"></script>
   <script src="stars-bg.js"></script>
   <script src="notifications.js"></script>
+  <script src="neon.js"></script>
   <script src="home.js"></script>
   <script src="magic-bento.js"></script>
   <script src="intro.js"></script>

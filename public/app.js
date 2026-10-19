@@ -124,6 +124,14 @@ function updateTitle() {
   $("viewTitle").textContent = cat ? cat.name : "Todos os componentes";
 }
 
+function codeCard(label, code) {
+  const snippet = escapeHtml(String(code || "").trim()).slice(0, 520);
+  return '<div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;gap:8px;text-align:left">' +
+    '<span style="align-self:flex-start;padding:4px 10px;border-radius:99px;background:#12162a;color:#9fb0ff;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">' + label + "</span>" +
+    '<pre style="margin:0;white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;line-height:1.5;background:#0d1020;color:#c9d2f0;border:1px solid #2a3050;border-radius:12px;padding:10px 12px;max-height:118px;overflow:hidden">' + snippet + "</pre>" +
+    "</div>";
+}
+
 function buildPreviewDoc(comp) {
   const blocks = comp.blocks || (comp.code ? [{ lang: comp.language || "html", code: comp.code }] : []);
   const htmlBlock = blocks.find((b) => b.lang === "html");
@@ -157,8 +165,11 @@ function buildPreviewDoc(comp) {
   if (htmlCode && /<[a-z]/i.test(htmlCode)) {
     body = htmlCode;
     if (jsCode) body += `<script>${jsCode}</script>`;
+  } else if (otherCode) {
+    const label = /^(jsx|tsx|js|ts)$/.test(otherLang) ? "react · " + otherLang : "codigo · " + otherLang;
+    body = codeCard(label, otherCode);
   } else if (cssCode && !htmlCode) {
-    body = `<div class="preview-box" style="padding:16px;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)">Preview</div>`;
+    body = codeCard("css", cssCode);
   } else if (jsCode && !htmlCode) {
     body = `<div id="app" style="padding:16px">Preview</div><script>${jsCode}</script>`;
   } else if (otherCode) {
